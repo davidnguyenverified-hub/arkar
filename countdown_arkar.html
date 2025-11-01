@@ -60,7 +60,7 @@
       const secs1 = Math.floor((diff1 / 1000) % 60);
 
       document.getElementById("weekly").textContent =
-        `${days1}d ${hours1}h ${mins1}m ${secs1}s until Saturday 17:00 UTC`;
+        `${days1}d ${hours1}h ${mins1}m ${secs1}s to Saturday 17:00 UTC`;
 
       // Castle Siege countdown
       const nextCastle = getNextCastleSiege();
@@ -71,7 +71,7 @@
       const secs2 = Math.floor((diff2 / 1000) % 60);
 
       document.getElementById("castle").textContent =
-        `${days2}d ${hours2}h ${mins2}m ${secs2}s until next Castle Siege (05:00 UTC)`;
+        `${days2}d ${hours2}h ${mins2}m ${secs2}s to Saturday 05:00 UTC`;
     }
 
     setInterval(updateCountdown, 1000);
@@ -79,4 +79,5 @@
   </script>
 </body>
 </html>
+
 
