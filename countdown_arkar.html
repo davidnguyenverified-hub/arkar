@@ -38,7 +38,7 @@
 
     // ====== Countdown 2: Every 2 weeks, 5:00 AM UTC, starting from 8 Nov 2025 ======
     function getNextCastleSiege() {
-      const start = new Date(Date.UTC(2025, 10, 8, 5, 0, 0)); // month 10 = November
+      const start = new Date(Date.UTC(2025, 10, 8, 21, 0, 0)); // month 10 = November
       const now = new Date();
       let diffWeeks = Math.floor((now - start) / (14 * 24 * 60 * 60 * 1000));
       if (diffWeeks < 0) diffWeeks = -1; // before first event
@@ -71,7 +71,7 @@
       const secs2 = Math.floor((diff2 / 1000) % 60);
 
       document.getElementById("castle").textContent =
-        `${days2}d ${hours2}h ${mins2}m ${secs2}s to Saturday 05:00 UTC`;
+        `${days2}d ${hours2}h ${mins2}m ${secs2}s to Saturday 21:00 UTC`;
     }
 
     setInterval(updateCountdown, 1000);
@@ -79,5 +79,6 @@
   </script>
 </body>
 </html>
+
 
 
