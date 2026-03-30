@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>MU Shop</title>
+<title>MU Item List</title>
 
 <style>
 body {
@@ -11,6 +11,7 @@ body {
   font-family: Arial;
 }
 
+/* SECTION */
 .section {
   margin: 30px 0;
 }
@@ -20,69 +21,65 @@ body {
   padding-left: 10px;
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 12px;
-}
-
-.card {
+/* TABLE */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
   background: #111;
-  padding: 10px;
   border-radius: 10px;
-  position: relative;
-  transition: 0.2s;
+  overflow: hidden;
 }
 
-.card:hover {
-  transform: scale(1.03);
-  box-shadow: 0 0 10px rgba(0,255,200,0.3);
+th, td {
+  padding: 10px;
+  text-align: left;
+  font-size: 13px;
 }
 
-.img {
-  height: 100px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.img img {
-  max-height: 100%;
-}
-
-.placeholder {
-  opacity: 0.5;
-}
-
-.sold {
-  opacity: 0.4;
-  filter: grayscale(80%);
-}
-
-.sold::after {
-  content: "SOLD";
-  position: absolute;
-  top: 40%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: red;
-  font-weight: bold;
-}
-
-.price {
+th {
+  background: #1a1a1f;
   color: #00ffcc;
 }
 
-.badge {
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  font-size: 11px;
+tr {
+  border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 
-.hot { color: orange; }
-.new { color: #00ffcc; }
+tr:hover {
+  background: rgba(0,255,200,0.05);
+}
 
+/* STATUS */
+.available {
+  color: #00ffcc;
+}
+
+.sold {
+  color: red;
+  opacity: 0.6;
+  text-decoration: line-through;
+}
+
+/* TAG */
+.tag-hot {
+  color: orange;
+}
+
+.tag-new {
+  color: #00ffcc;
+}
+
+/* IMAGE */
+.img {
+  width: 40px;
+}
+
+.img img {
+  width: 32px;
+}
+
+/* SMALL TEXT */
 .details {
   font-size: 11px;
   opacity: 0.7;
@@ -93,7 +90,7 @@ body {
 
 <body>
 
-<h1>🛒 MU Taxi Shop</h1>
+<h1>📦 Items On Sale</h1>
 <div id="app"></div>
 
 <script>
@@ -114,7 +111,6 @@ fetch(SHEET_URL)
     render(data);
   });
 
-// FIX CSV (quan trọng nếu có dấu phẩy)
 function parseCSV(text) {
   const rows = text.split("\n");
   const headers = rows[0].split(",");
@@ -129,7 +125,6 @@ function parseCSV(text) {
   });
 }
 
-// chuẩn hóa
 function normalize(item) {
   return {
     ...item,
@@ -157,52 +152,51 @@ function render(items) {
 
     section.innerHTML = `<h2>${type.toUpperCase()}</h2>`;
 
-    const grid = document.createElement("div");
-    grid.className = "grid";
+    const table = document.createElement("table");
 
+    table.innerHTML = `
+      <tr>
+        <th></th>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Details</th>
+        <th>Price</th>
+        <th>Status</th>
+      </tr>
+    `;
+
+    // SORT
     grouped[type].sort((a, b) => {
       if (a.Status === b.Status) return 0;
       return a.Status === "available" ? -1 : 1;
     });
 
     grouped[type].forEach(item => {
-      grid.innerHTML += renderCard(item);
+
+      const icon = item.Image
+        ? `<img src="${item.Image}" />`
+        : `<img src="${iconMap[item.Type] || iconMap.wing}" />`;
+
+      const statusClass = item.Status === "sold" ? "sold" : "available";
+
+      const tagLabel = item.Tag?.includes("hot") ? `<span class="tag-hot">HOT</span>` :
+                       item.Tag?.includes("new") ? `<span class="tag-new">NEW</span>` : "";
+
+      table.innerHTML += `
+        <tr class="${statusClass}">
+          <td class="img">${icon}</td>
+          <td>${item.ID}</td>
+          <td>${item.Name} ${tagLabel}</td>
+          <td class="details">${item.Details || ""}</td>
+          <td>${item.Price}</td>
+          <td>${item.Status}</td>
+        </tr>
+      `;
     });
 
-    section.appendChild(grid);
+    section.appendChild(table);
     app.appendChild(section);
   }
-}
-
-function renderCard(item) {
-
-  const isSold = item.Status === "sold";
-
-  const imageHTML = item.Image
-    ? `<img src="${item.Image}" />`
-    : `<img class="placeholder" src="${iconMap[item.Type] || iconMap.wing}" />`;
-
-  const tagClass = item.Tag?.includes("hot") ? "hot" :
-                   item.Tag?.includes("new") ? "new" : "";
-
-  return `
-    <div class="card ${isSold ? "sold" : ""}">
-
-      <div class="badge ${tagClass}">
-        ${item.Tag || ""}
-      </div>
-
-      <div class="img">
-        ${imageHTML}
-      </div>
-
-      <div>${item.Name}</div>
-      <div>ID: ${item.ID}</div>
-      <div class="price">${item.Price}</div>
-      <div class="details">${item.Details || ""}</div>
-
-    </div>
-  `;
 }
 
 </script>
