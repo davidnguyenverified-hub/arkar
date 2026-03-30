@@ -6,9 +6,9 @@
 
 <style>
 body {
-  background: #0b0b0e;
-  color: #fff;
-  font-family: Arial;
+  background: transparent; /* QUAN TRỌNG khi dùng iframe */
+  font-family: Inter, Arial;
+  color: #222;
 }
 
 /* SECTION */
@@ -17,8 +17,11 @@ body {
 }
 
 .section h2 {
-  border-left: 4px solid #00ffcc;
-  padding-left: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  border-left: 3px solid #00c2a8;
+  padding-left: 8px;
+  color: #222;
 }
 
 /* TABLE */
@@ -26,91 +29,81 @@ table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 10px;
-  background: #111;
-  border-radius: 10px;
+  background: #fff;
+  border-radius: 8px;
   overflow: hidden;
+  border: 1px solid #e5e5e5;
 }
 
-th, td {
-  padding: 10px;
+/* HEADER */
+th {
   text-align: left;
+  padding: 10px;
+  font-size: 12px;
+  color: #666;
+  background: #f5f5f5;
+  font-weight: 500;
+}
+
+/* ROW */
+td {
+  padding: 10px;
   font-size: 13px;
 }
 
-th {
-  background: #1a1a1f;
-  color: #00ffcc;
-}
-
 tr {
-  border-bottom: 1px solid rgba(255,255,255,0.05);
+  border-bottom: 1px solid #eee;
 }
 
 tr:hover {
-  background: rgba(0,255,200,0.05);
+  background: #f9f9f9;
 }
 
 /* STATUS */
 .available {
-  color: #00ffcc;
+  color: #00a67d;
+  font-weight: 500;
 }
 
 .sold {
-  color: #ff4d4d;
-  opacity: 0.6;
+  color: #999;
   text-decoration: line-through;
 }
 
 /* IMAGE */
-.img {
-  width: 40px;
-}
-
 .img img {
-  width: 28px;
+  width: 24px;
+  opacity: 0.7;
 }
 
 /* DETAILS */
 .details {
-  font-size: 11px;
-  opacity: 0.7;
+  font-size: 12px;
+  color: #666;
 }
 
-/* 🔥 BADGE STYLE XỊN */
+/* BADGE */
 .badge {
-  display: inline-block;
-  font-size: 9px;
+  font-size: 10px;
   padding: 2px 6px;
   margin-left: 6px;
   border-radius: 6px;
   position: relative;
-  top: -6px;
-  letter-spacing: 0.5px;
+  top: -4px;
 }
 
-/* HOT = nổi bật */
+/* HOT */
 .badge-hot {
-  color: #fff;
-  background: linear-gradient(45deg, #ff6600, #ffcc00);
-  box-shadow: 0 0 6px rgba(255,140,0,0.6);
-  font-weight: bold;
+  background: #fff3cd;
+  color: #b7791f;
+  border: 1px solid #ffeeba;
 }
 
-/* NEW = nhẹ nhàng */
+/* NEW */
 .badge-new {
-  color: #00ffcc;
-  background: rgba(0,255,200,0.08);
-  border: 1px solid rgba(0,255,200,0.3);
-  opacity: 0.8;
-}
-
-/* hover effect */
-.badge-hot:hover {
-  box-shadow: 0 0 10px orange;
-}
-
-.badge-new:hover {
-  opacity: 1;
+  background: #e6fffa;
+  color: #0f766e;
+  border: 1px solid #b2f5ea;
 }
 </style>
 
@@ -118,7 +111,6 @@ tr:hover {
 
 <body>
 
-<h1>📦 FULL LIST OF ITEM ON SALE</h1>
 <div id="app"></div>
 
 <script>
@@ -126,10 +118,10 @@ tr:hover {
 const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQgQuqvQJuRPCw_zJfgdGn0awqWwTweuJS1k2TPg83XOHsACvQnVxKZeMETZErpxuLXDBJyxXjMkVRJ/pub?gid=0&single=true&output=csv";
 
 const iconMap = {
-  wing: "https://img.icons8.com/ios-filled/50/ffffff/wings.png",
-  jewel: "https://img.icons8.com/ios-filled/50/ffffff/gem.png",
-  staff: "https://img.icons8.com/ios-filled/50/ffffff/magic.png",
-  shield: "https://img.icons8.com/ios-filled/50/ffffff/shield.png"
+  wing: "https://img.icons8.com/ios-filled/50/999999/wings.png",
+  jewel: "https://img.icons8.com/ios-filled/50/999999/gem.png",
+  staff: "https://img.icons8.com/ios-filled/50/999999/magic.png",
+  shield: "https://img.icons8.com/ios-filled/50/999999/shield.png"
 };
 
 fetch(SHEET_URL)
