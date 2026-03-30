@@ -6,7 +6,7 @@
 
 <style>
 body {
-  background: transparent; /* QUAN TRỌNG khi dùng iframe */
+  background: transparent;
   font-family: Inter, Arial;
   color: #222;
 }
@@ -21,7 +21,6 @@ body {
   font-weight: 600;
   border-left: 3px solid #00c2a8;
   padding-left: 8px;
-  color: #222;
 }
 
 /* TABLE */
@@ -35,17 +34,14 @@ table {
   border: 1px solid #e5e5e5;
 }
 
-/* HEADER */
 th {
-  text-align: left;
   padding: 10px;
   font-size: 12px;
   color: #666;
   background: #f5f5f5;
-  font-weight: 500;
+  text-align: left;
 }
 
-/* ROW */
 td {
   padding: 10px;
   font-size: 13px;
@@ -65,13 +61,14 @@ tr:hover {
   font-weight: 500;
 }
 
-.sold {
+.sold td {
   text-decoration: line-through;
+  color: #999;
 }
 
-/* IMAGE */
+/* ICON */
 .img img {
-  width: 24px;
+  width: 22px;
   opacity: 0.7;
 }
 
@@ -91,14 +88,12 @@ tr:hover {
   top: -4px;
 }
 
-/* HOT */
 .badge-hot {
   background: #fff3cd;
   color: #b7791f;
   border: 1px solid #ffeeba;
 }
 
-/* NEW */
 .badge-new {
   background: #e6fffa;
   color: #0f766e;
@@ -116,11 +111,30 @@ tr:hover {
 
 const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQgQuqvQJuRPCw_zJfgdGn0awqWwTweuJS1k2TPg83XOHsACvQnVxKZeMETZErpxuLXDBJyxXjMkVRJ/pub?gid=0&single=true&output=csv";
 
+// ✅ ORDER TYPE CỐ ĐỊNH
+const TYPE_ORDER = [
+  "wing","pentagram","shield","staff","scepter","lance",
+  "bow","blade","sword","armor set","earring",
+  "socket items","upgrade materials","jewel","artifact"
+];
+
+// ✅ ICON MAP FULL
 const iconMap = {
   wing: "https://img.icons8.com/ios-filled/50/999999/wings.png",
-  jewel: "https://img.icons8.com/ios-filled/50/999999/gem.png",
+  pentagram: "https://img.icons8.com/ios-filled/50/999999/magic.png",
+  shield: "https://img.icons8.com/ios-filled/50/999999/shield.png",
   staff: "https://img.icons8.com/ios-filled/50/999999/magic.png",
-  shield: "https://img.icons8.com/ios-filled/50/999999/shield.png"
+  scepter: "https://img.icons8.com/ios-filled/50/999999/magic.png",
+  lance: "https://img.icons8.com/ios-filled/50/999999/spear.png",
+  bow: "https://img.icons8.com/ios-filled/50/999999/bow.png",
+  blade: "https://img.icons8.com/ios-filled/50/999999/sword.png",
+  sword: "https://img.icons8.com/ios-filled/50/999999/sword.png",
+  "armor set": "https://img.icons8.com/ios-filled/50/999999/armor.png",
+  earring: "https://img.icons8.com/ios-filled/50/999999/jewelry.png",
+  "socket items": "https://img.icons8.com/ios-filled/50/999999/lego.png",
+  "upgrade materials": "https://img.icons8.com/ios-filled/50/999999/tools.png",
+  jewel: "https://img.icons8.com/ios-filled/50/999999/gem.png",
+  artifact: "https://img.icons8.com/ios-filled/50/999999/star.png"
 };
 
 fetch(SHEET_URL)
@@ -148,8 +162,8 @@ function normalize(item) {
   return {
     ...item,
     Status: item.Status?.toLowerCase().trim(),
-    Type: item.Type?.toLowerCase(),
-    Tag: item.Tag?.toLowerCase()
+    Type: item.Type?.toLowerCase().trim(),
+    Tag: item.Tag?.toLowerCase().trim()
   };
 }
 
@@ -158,67 +172,79 @@ function render(items) {
   const grouped = {};
 
   items.forEach(item => {
-    if (!grouped[item.Type]) grouped[item.Type] = [];
-    grouped[item.Type].push(item);
+    const type = item.Type || "other";
+    if (!grouped[type]) grouped[type] = [];
+    grouped[type].push(item);
   });
 
   const app = document.getElementById("app");
 
-  for (let type in grouped) {
+  // ✅ render theo thứ tự cố định
+  TYPE_ORDER.forEach(type => {
+    if (!grouped[type]) return;
+    renderSection(type, grouped[type], app);
+  });
 
-    const section = document.createElement("div");
-    section.className = "section";
+  // ✅ render type lạ (nếu có)
+  Object.keys(grouped).forEach(type => {
+    if (!TYPE_ORDER.includes(type)) {
+      renderSection(type, grouped[type], app);
+    }
+  });
+}
 
-    section.innerHTML = `<h2>${type.toUpperCase()}</h2>`;
+function renderSection(type, items, app) {
 
-    const table = document.createElement("table");
+  const section = document.createElement("div");
+  section.className = "section";
 
-    table.innerHTML = `
-      <tr>
-        <th></th>
-        <th>ID</th>
-        <th>Name</th>
-        <th>Details</th>
-        <th>Price</th>
-        <th>Status</th>
+  section.innerHTML = `<h2>${type.toUpperCase()}</h2>`;
+
+  const table = document.createElement("table");
+
+  table.innerHTML = `
+    <tr>
+      <th></th>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Details</th>
+      <th>Price</th>
+      <th>Status</th>
+    </tr>
+  `;
+
+  items.sort((a, b) => {
+    if (a.Status === b.Status) return 0;
+    return a.Status === "available" ? -1 : 1;
+  });
+
+  items.forEach(item => {
+
+    const icon = `<img src="${iconMap[type] || iconMap.sword}" />`;
+
+    const statusClass = item.Status === "sold" ? "sold" : "available";
+
+    let tagHTML = "";
+    if (item.Tag.includes("hot")) {
+      tagHTML = `<span class="badge badge-hot">HOT</span>`;
+    } else if (item.Tag.includes("new")) {
+      tagHTML = `<span class="badge badge-new">NEW</span>`;
+    }
+
+    table.innerHTML += `
+      <tr class="${statusClass}">
+        <td class="img">${icon}</td>
+        <td>${item.ID}</td>
+        <td>${item.Name} ${tagHTML}</td>
+        <td class="details">${item.Details || ""}</td>
+        <td>${item.Price}</td>
+        <td>${item.Status}</td>
       </tr>
     `;
+  });
 
-    grouped[type].sort((a, b) => {
-      if (a.Status === b.Status) return 0;
-      return a.Status === "available" ? -1 : 1;
-    });
-
-    grouped[type].forEach(item => {
-
-      const icon = item.Image
-        ? `<img src="${item.Image}" />`
-        : `<img src="${iconMap[item.Type] || iconMap.wing}" />`;
-
-      const statusClass = item.Status === "sold" ? "sold" : "available";
-
-      let tagHTML = "";
-      if (item.Tag?.includes("hot")) {
-        tagHTML = `<span class="badge badge-hot">HOT</span>`;
-      } else if (item.Tag?.includes("new")) {
-        tagHTML = `<span class="badge badge-new">NEW</span>`;
-      }
-
-      table.innerHTML += `
-        <tr class="${statusClass}">
-          <td class="img">${icon}</td>
-          <td>${item.ID}</td>
-          <td>${item.Name} ${tagHTML}</td>
-          <td class="details">${item.Details || ""}</td>
-          <td>${item.Price}</td>
-          <td>${item.Status}</td>
-        </tr>
-      `;
-    });
-
-    section.appendChild(table);
-    app.appendChild(section);
-  }
+  section.appendChild(table);
+  app.appendChild(section);
 }
 
 </script>
