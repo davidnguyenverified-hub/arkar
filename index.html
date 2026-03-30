@@ -220,7 +220,7 @@ function renderSection(type, items, app) {
 
   items.forEach(item => {
 
-    const icon = `<img src="${iconMap[type] || iconMap.sword}" />`;
+    const icon = `<img src="${iconMap[type] || iconMap["sword"]}" />`;
 
     const statusClass = item.Status === "sold" ? "sold" : "available";
 
