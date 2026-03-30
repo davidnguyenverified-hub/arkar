@@ -56,18 +56,9 @@ tr:hover {
 }
 
 .sold {
-  color: red;
+  color: #ff4d4d;
   opacity: 0.6;
   text-decoration: line-through;
-}
-
-/* TAG */
-.tag-hot {
-  color: orange;
-}
-
-.tag-new {
-  color: #00ffcc;
 }
 
 /* IMAGE */
@@ -76,13 +67,50 @@ tr:hover {
 }
 
 .img img {
-  width: 32px;
+  width: 28px;
 }
 
-/* SMALL TEXT */
+/* DETAILS */
 .details {
   font-size: 11px;
   opacity: 0.7;
+}
+
+/* 🔥 BADGE STYLE XỊN */
+.badge {
+  display: inline-block;
+  font-size: 9px;
+  padding: 2px 6px;
+  margin-left: 6px;
+  border-radius: 6px;
+  position: relative;
+  top: -6px;
+  letter-spacing: 0.5px;
+}
+
+/* HOT = nổi bật */
+.badge-hot {
+  color: #fff;
+  background: linear-gradient(45deg, #ff6600, #ffcc00);
+  box-shadow: 0 0 6px rgba(255,140,0,0.6);
+  font-weight: bold;
+}
+
+/* NEW = nhẹ nhàng */
+.badge-new {
+  color: #00ffcc;
+  background: rgba(0,255,200,0.08);
+  border: 1px solid rgba(0,255,200,0.3);
+  opacity: 0.8;
+}
+
+/* hover effect */
+.badge-hot:hover {
+  box-shadow: 0 0 10px orange;
+}
+
+.badge-new:hover {
+  opacity: 1;
 }
 </style>
 
@@ -90,7 +118,7 @@ tr:hover {
 
 <body>
 
-<h1>📦 Items On Sale</h1>
+<h1>📦 FULL LIST OF ITEM ON SALE</h1>
 <div id="app"></div>
 
 <script>
@@ -165,7 +193,6 @@ function render(items) {
       </tr>
     `;
 
-    // SORT
     grouped[type].sort((a, b) => {
       if (a.Status === b.Status) return 0;
       return a.Status === "available" ? -1 : 1;
@@ -179,14 +206,18 @@ function render(items) {
 
       const statusClass = item.Status === "sold" ? "sold" : "available";
 
-      const tagLabel = item.Tag?.includes("hot") ? `<span class="tag-hot">HOT</span>` :
-                       item.Tag?.includes("new") ? `<span class="tag-new">NEW</span>` : "";
+      let tagHTML = "";
+      if (item.Tag?.includes("hot")) {
+        tagHTML = `<span class="badge badge-hot">HOT</span>`;
+      } else if (item.Tag?.includes("new")) {
+        tagHTML = `<span class="badge badge-new">NEW</span>`;
+      }
 
       table.innerHTML += `
         <tr class="${statusClass}">
           <td class="img">${icon}</td>
           <td>${item.ID}</td>
-          <td>${item.Name} ${tagLabel}</td>
+          <td>${item.Name} ${tagHTML}</td>
           <td class="details">${item.Details || ""}</td>
           <td>${item.Price}</td>
           <td>${item.Status}</td>
