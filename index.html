@@ -66,7 +66,6 @@ tr:hover {
 }
 
 .sold {
-  color: #999;
   text-decoration: line-through;
 }
 
@@ -148,7 +147,7 @@ function parseCSV(text) {
 function normalize(item) {
   return {
     ...item,
-    Status: item.Status?.toLowerCase(),
+    Status: item.Status?.toLowerCase().trim(),
     Type: item.Type?.toLowerCase(),
     Tag: item.Tag?.toLowerCase()
   };
