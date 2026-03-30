@@ -1,20 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<title>MU Taxi Shop</title>
+<title>MU Shop</title>
 
 <style>
 body {
   background: #0b0b0e;
   color: #fff;
   font-family: Arial;
-  padding: 20px;
 }
 
-/* SECTION */
 .section {
-  margin-bottom: 40px;
+  margin: 30px 0;
 }
 
 .section h2 {
@@ -22,18 +20,16 @@ body {
   padding-left: 10px;
 }
 
-/* GRID */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
   gap: 12px;
 }
 
-/* CARD */
 .card {
   background: #111;
-  border-radius: 10px;
   padding: 10px;
+  border-radius: 10px;
   position: relative;
   transition: 0.2s;
 }
@@ -43,35 +39,21 @@ body {
   box-shadow: 0 0 10px rgba(0,255,200,0.3);
 }
 
-/* IMAGE */
 .img {
   height: 100px;
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
 }
 
 .img img {
   max-height: 100%;
 }
 
-/* PLACEHOLDER */
 .placeholder {
   opacity: 0.5;
 }
 
-/* TEXT */
-.name {
-  font-size: 13px;
-  margin-top: 5px;
-}
-
-.price {
-  color: #00ffcc;
-  font-weight: bold;
-}
-
-/* SOLD */
 .sold {
   opacity: 0.4;
   filter: grayscale(80%);
@@ -84,11 +66,13 @@ body {
   left: 50%;
   transform: translate(-50%, -50%);
   color: red;
-  font-size: 16px;
   font-weight: bold;
 }
 
-/* BADGE */
+.price {
+  color: #00ffcc;
+}
+
 .badge {
   position: absolute;
   top: 5px;
@@ -99,52 +83,66 @@ body {
 .hot { color: orange; }
 .new { color: #00ffcc; }
 
+.details {
+  font-size: 11px;
+  opacity: 0.7;
+}
 </style>
+
 </head>
 
 <body>
 
 <h1>🛒 MU Taxi Shop</h1>
-
 <div id="app"></div>
 
 <script>
 
-// 👉 DÁN LINK CSV Ở ĐÂY
 const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQgQuqvQJuRPCw_zJfgdGn0awqWwTweuJS1k2TPg83XOHsACvQnVxKZeMETZErpxuLXDBJyxXjMkVRJ/pub?gid=0&single=true&output=csv";
 
-// icon fallback theo type
 const iconMap = {
   wing: "https://img.icons8.com/ios-filled/50/ffffff/wings.png",
-  weapon: "https://img.icons8.com/ios-filled/50/ffffff/sword.png",
-  pentagram: "https://img.icons8.com/ios-filled/50/ffffff/magic.png"
+  jewel: "https://img.icons8.com/ios-filled/50/ffffff/gem.png",
+  staff: "https://img.icons8.com/ios-filled/50/ffffff/magic.png",
+  shield: "https://img.icons8.com/ios-filled/50/ffffff/shield.png"
 };
 
-// fetch CSV
 fetch(SHEET_URL)
   .then(res => res.text())
   .then(csv => {
-    const data = parseCSV(csv);
+    const data = parseCSV(csv).map(normalize);
     render(data);
   });
 
-// parse CSV
+// FIX CSV (quan trọng nếu có dấu phẩy)
 function parseCSV(text) {
-  const rows = text.split("\n").map(r => r.split(","));
-  const headers = rows[0];
+  const rows = text.split("\n");
+  const headers = rows[0].split(",");
 
   return rows.slice(1).map(row => {
+    const values = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
     let obj = {};
-    headers.forEach((h, i) => obj[h.trim()] = row[i]);
+    headers.forEach((h, i) => {
+      obj[h.trim()] = values[i]?.replace(/"/g, "");
+    });
     return obj;
   });
 }
 
-// render main
+// chuẩn hóa
+function normalize(item) {
+  return {
+    ...item,
+    Status: item.Status?.toLowerCase(),
+    Type: item.Type?.toLowerCase(),
+    Tag: item.Tag?.toLowerCase()
+  };
+}
+
 function render(items) {
 
-  // GROUP BY TYPE
   const grouped = {};
+
   items.forEach(item => {
     if (!grouped[item.Type]) grouped[item.Type] = [];
     grouped[item.Type].push(item);
@@ -162,7 +160,6 @@ function render(items) {
     const grid = document.createElement("div");
     grid.className = "grid";
 
-    // SORT: available -> sold
     grouped[type].sort((a, b) => {
       if (a.Status === b.Status) return 0;
       return a.Status === "available" ? -1 : 1;
@@ -177,19 +174,21 @@ function render(items) {
   }
 }
 
-// render card
 function renderCard(item) {
 
   const isSold = item.Status === "sold";
 
   const imageHTML = item.Image
     ? `<img src="${item.Image}" />`
-    : `<img class="placeholder" src="${iconMap[item.Type] || iconMap.weapon}" />`;
+    : `<img class="placeholder" src="${iconMap[item.Type] || iconMap.wing}" />`;
+
+  const tagClass = item.Tag?.includes("hot") ? "hot" :
+                   item.Tag?.includes("new") ? "new" : "";
 
   return `
     <div class="card ${isSold ? "sold" : ""}">
-      
-      <div class="badge ${item.Tag}">
+
+      <div class="badge ${tagClass}">
         ${item.Tag || ""}
       </div>
 
@@ -197,9 +196,10 @@ function renderCard(item) {
         ${imageHTML}
       </div>
 
-      <div class="name">${item.Name}</div>
+      <div>${item.Name}</div>
       <div>ID: ${item.ID}</div>
-      <div class="price">${item.Price}$</div>
+      <div class="price">${item.Price}</div>
+      <div class="details">${item.Details || ""}</div>
 
     </div>
   `;
