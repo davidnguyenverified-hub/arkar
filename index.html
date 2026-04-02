@@ -2,13 +2,48 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>MU Item List</title>
+<title>MU Item Dashboard</title>
 
 <style>
 body {
   background: transparent;
   font-family: Inter, Arial;
   color: #222;
+}
+
+/* DASHBOARD */
+.dashboard {
+  display:flex;
+  gap:12px;
+  margin-bottom:20px;
+}
+
+.stat {
+  flex:1;
+  background:#fff;
+  border:1px solid #e5e5e5;
+  border-radius:10px;
+  padding:12px;
+  text-align:center;
+  transition:0.2s;
+  cursor:pointer;
+}
+
+.stat:hover {
+  transform:translateY(-3px);
+  box-shadow:0 8px 18px rgba(0,0,0,0.08);
+  border-color:#00c2a8;
+}
+
+.num {
+  font-size:18px;
+  font-weight:bold;
+  color:#00a67d;
+}
+
+.label {
+  font-size:12px;
+  color:#666;
 }
 
 /* SECTION */
@@ -49,10 +84,17 @@ td {
 
 tr {
   border-bottom: 1px solid #eee;
+  transition:0.2s;
 }
 
 tr:hover {
-  background: #f9f9f9;
+  background:#f1f5f9;
+  transform: scale(1.01);
+  cursor:pointer;
+}
+
+tr:active {
+  transform: scale(0.98);
 }
 
 /* STATUS */
@@ -66,10 +108,20 @@ tr:hover {
   color: #999;
 }
 
+.sold:hover {
+  background:#fef2f2;
+}
+
 /* ICON */
 .img img {
   width: 22px;
   opacity: 0.7;
+  transition:0.2s;
+}
+
+tr:hover .img img {
+  transform: scale(1.2);
+  opacity:1;
 }
 
 /* DETAILS */
@@ -99,134 +151,38 @@ tr:hover {
   color: #0f766e;
   border: 1px solid #b2f5ea;
 }
-
-  .dashboard {
-  display:flex;
-  gap:12px;
-  margin-bottom:20px;
-}
-
-.stat {
-  flex:1;
-  background:#fff;
-  border:1px solid #e5e5e5;
-  border-radius:10px;
-  padding:12px;
-  text-align:center;
-  transition:0.2s;
-  cursor:pointer;
-}
-
-.stat:hover {
-  transform:translateY(-3px);
-  box-shadow:0 8px 18px rgba(0,0,0,0.08);
-  border-color:#00c2a8;
-}
-
-.num {
-  font-size:18px;
-  font-weight:bold;
-  color:#00a67d;
-}
-
-.label {
-  font-size:12px;
-  color:#666;
-}
-  tr {
-  transition:0.2s;
-}
-
-tr:hover {
-  background:#f1f5f9;
-  transform: scale(1.01);
-  cursor:pointer;
-}
-  .img img {
-  transition:0.2s;
-}
-
-tr:hover .img img {
-  transform: scale(1.2);
-  opacity:1;
-}
-  .sold:hover {
-  background:#fef2f2;
-}
-  table tr {
-  cursor:pointer;
-}
-  tr:active {
-  transform: scale(0.98);
-}
 </style>
 
 </head>
 
 <body>
 
-<div id="app">
-let total = items.length;
-let available = items.filter(i => i.Status === "available").length;
-let sold = items.filter(i => i.Status === "sold").length;
-
-// optional: đếm theo type
-let typeStats = {};
-items.forEach(i => {
-  let t = i.Type || "other";
-  if (!typeStats[t]) typeStats[t] = 0;
-  typeStats[t]++;
-});
-
-const app = document.getElementById("app");
-
-app.innerHTML = `
-  <div class="dashboard">
-    <div class="stat">
-      <div class="num">${available}</div>
-      <div class="label">Available</div>
-    </div>
-
-    <div class="stat">
-      <div class="num">${sold}</div>
-      <div class="label">Sold</div>
-    </div>
-
-    <div class="stat">
-      <div class="num">${total}</div>
-      <div class="label">Total Items</div>
-    </div>
-  </div>
-`;
-  
-</div>
+<div id="app">Loading...</div>
 
 <script>
 
 const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQgQuqvQJuRPCw_zJfgdGn0awqWwTweuJS1k2TPg83XOHsACvQnVxKZeMETZErpxuLXDBJyxXjMkVRJ/pub?gid=0&single=true&output=csv";
 
-// ✅ ORDER TYPE CỐ ĐỊNH
 const TYPE_ORDER = [
   "jewel","wing","pentagram","shield","staff","scepter","lance",
   "bow","blade","sword","armor set","earring",
   "socket items","upgrade materials","artifact"
 ];
 
-// ✅ ICON MAP FULL
 const iconMap = {
   wing: "https://img.icons8.com/?size=100&id=oh3EebcDB2uo&format=png",
   pentagram: "https://img.icons8.com/?size=100&id=8CmyTjfIgbMr&format=png",
   shield: "https://img.icons8.com/ios-filled/50/999999/shield.png",
   staff: "https://img.icons8.com/?size=100&id=12133&format=png",
   scepter: "https://img.icons8.com/ios-filled/50/999999/magic.png",
-  lance: "https://img.icons8.com/?size=100&id=vfrg92oxOnnZ&format=png&color=000000",
+  lance: "https://img.icons8.com/?size=100&id=vfrg92oxOnnZ&format=png",
   bow: "https://img.icons8.com/ios-filled/50/999999/bow.png",
   blade: "https://img.icons8.com/ios-filled/50/999999/sword.png",
   sword: "https://img.icons8.com/ios-filled/50/999999/sword.png",
-  "armor set": "https://img.icons8.com/?size=100&id=qxukQNU94HC4&format=png&color=000000",
+  "armor set": "https://img.icons8.com/?size=100&id=qxukQNU94HC4&format=png",
   earring: "https://img.icons8.com/ios-filled/50/999999/jewelry.png",
   "socket items": "https://img.icons8.com/ios-filled/50/999999/lego.png",
-  "upgrade materials": "https://img.icons8.com/?size=100&id=azn4RGKoU6yS&format=png&color=000000",
+  "upgrade materials": "https://img.icons8.com/?size=100&id=azn4RGKoU6yS&format=png",
   jewel: "https://img.icons8.com/?size=100&id=49423&format=png",
   artifact: "https://img.icons8.com/ios-filled/50/999999/star.png"
 };
@@ -263,8 +219,11 @@ function normalize(item) {
 
 function render(items) {
 
-  const grouped = {};
+  let total = items.length;
+  let available = items.filter(i => i.Status === "available").length;
+  let sold = items.filter(i => i.Status === "sold").length;
 
+  const grouped = {};
   items.forEach(item => {
     const type = item.Type || "other";
     if (!grouped[type]) grouped[type] = [];
@@ -273,13 +232,30 @@ function render(items) {
 
   const app = document.getElementById("app");
 
-  // ✅ render theo thứ tự cố định
+  app.innerHTML = `
+    <div class="dashboard">
+      <div class="stat">
+        <div class="num">${available}</div>
+        <div class="label">Available</div>
+      </div>
+
+      <div class="stat">
+        <div class="num">${sold}</div>
+        <div class="label">Sold</div>
+      </div>
+
+      <div class="stat">
+        <div class="num">${total}</div>
+        <div class="label">Total Items</div>
+      </div>
+    </div>
+  `;
+
   TYPE_ORDER.forEach(type => {
     if (!grouped[type]) return;
     renderSection(type, grouped[type], app);
   });
 
-  // ✅ render type lạ (nếu có)
   Object.keys(grouped).forEach(type => {
     if (!TYPE_ORDER.includes(type)) {
       renderSection(type, grouped[type], app);
