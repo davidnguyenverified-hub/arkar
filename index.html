@@ -99,13 +99,107 @@ tr:hover {
   color: #0f766e;
   border: 1px solid #b2f5ea;
 }
+
+  .dashboard {
+  display:flex;
+  gap:12px;
+  margin-bottom:20px;
+}
+
+.stat {
+  flex:1;
+  background:#fff;
+  border:1px solid #e5e5e5;
+  border-radius:10px;
+  padding:12px;
+  text-align:center;
+  transition:0.2s;
+  cursor:pointer;
+}
+
+.stat:hover {
+  transform:translateY(-3px);
+  box-shadow:0 8px 18px rgba(0,0,0,0.08);
+  border-color:#00c2a8;
+}
+
+.num {
+  font-size:18px;
+  font-weight:bold;
+  color:#00a67d;
+}
+
+.label {
+  font-size:12px;
+  color:#666;
+}
+  tr {
+  transition:0.2s;
+}
+
+tr:hover {
+  background:#f1f5f9;
+  transform: scale(1.01);
+  cursor:pointer;
+}
+  .img img {
+  transition:0.2s;
+}
+
+tr:hover .img img {
+  transform: scale(1.2);
+  opacity:1;
+}
+  .sold:hover {
+  background:#fef2f2;
+}
+  table tr {
+  cursor:pointer;
+}
+  tr:active {
+  transform: scale(0.98);
+}
 </style>
 
 </head>
 
 <body>
 
-<div id="app"></div>
+<div id="app">
+let total = items.length;
+let available = items.filter(i => i.Status === "available").length;
+let sold = items.filter(i => i.Status === "sold").length;
+
+// optional: đếm theo type
+let typeStats = {};
+items.forEach(i => {
+  let t = i.Type || "other";
+  if (!typeStats[t]) typeStats[t] = 0;
+  typeStats[t]++;
+});
+
+const app = document.getElementById("app");
+
+app.innerHTML = `
+  <div class="dashboard">
+    <div class="stat">
+      <div class="num">${available}</div>
+      <div class="label">Available</div>
+    </div>
+
+    <div class="stat">
+      <div class="num">${sold}</div>
+      <div class="label">Sold</div>
+    </div>
+
+    <div class="stat">
+      <div class="num">${total}</div>
+      <div class="label">Total Items</div>
+    </div>
+  </div>
+`;
+  
+</div>
 
 <script>
 
